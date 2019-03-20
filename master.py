@@ -10,6 +10,8 @@ import tensorflow as tf
 from pprint import pprint
 from tensorflow.python.keras.preprocessing.text import Tokenizer
 from tensorflow.python.keras.preprocessing.sequence import pad_sequences
+from tensorflow.python.keras.layers import Input, Dense, GRU, Embedding
+from tensorflow.python.keras.models import Model
 
 start = time.time()
 
@@ -167,6 +169,66 @@ print(decoder_output_data[5])
 
 print(tokenizer_snippets.tokens_to_string(decoder_input_data[5]))
 print(tokenizer_snippets.tokens_to_string(decoder_output_data[5]))
+
+encoder_input = Input(shape=(None, ), name='encoder_input')
+embedding_size = 128
+encoder_embedding = Embedding(input_dim=num_words, output_dim=embedding_size, name='encoder_embedding')
+state_size = 512
+
+encoder_gru1 = GRU(state_size, name='encoder_gru1', return_sequences=True)
+encoder_gru2 = GRU(state_size, name='encoder_gru2', return_sequences=True)
+encoder_gru3 = GRU(state_size, name='encoder_gru3', return_sequences=False)
+
+def connect_encoder():
+    # Start the neural network with its input-layer.
+    net = encoder_input
+    
+    # Connect the embedding-layer.
+    net = encoder_embedding(net)
+
+    # Connect all the GRU-layers.
+    net = encoder_gru1(net)
+    net = encoder_gru2(net)
+    net = encoder_gru3(net)
+
+    # This is the output of the encoder.
+    encoder_output = net
+    
+    return encoder_output
+
+encoder_output = connect_encoder()
+
+decoder_initial_state = Input(shape=(state_size,), name='decoder_initial_state')
+decoder_input = Input(shape=(None, ), name='decoder_input')
+decoder_embedding = Embedding(input_dim=num_words, output_dim=embedding_size, name='decoder_embedding')
+
+decoder_gru1 = GRU(state_size, name='decoder_gru1', return_sequences=True)
+decoder_gru2 = GRU(state_size, name='decoder_gru2', return_sequences=True)
+decoder_gru3 = GRU(state_size, name='decoder_gru3', return_sequences=True)
+
+decoder_dense = Dense(num_words, activation='linear', name='decoder_output')
+
+
+def connect_decoder(initial_state):
+    # Start the decoder-network with its input-layer.
+    net = decoder_input
+
+    # Connect the embedding-layer.
+    net = decoder_embedding(net)
+    
+    # Connect all the GRU-layers.
+    net = decoder_gru1(net, initial_state=initial_state)
+    net = decoder_gru2(net, initial_state=initial_state)
+    net = decoder_gru3(net, initial_state=initial_state)
+
+    # Connect the final dense layer that converts to
+    # one-hot encoded arrays.
+    decoder_output = decoder_dense(net)
+    
+    return decoder_output
+
+decoder_output = connect_decoder(initial_state=encoder_output)
+model_train = Model(inputs=[encoder_input, decoder_input], outputs=[decoder_output])
 
 end = time.time()
 print(end - start)
