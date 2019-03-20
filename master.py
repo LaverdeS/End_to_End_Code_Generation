@@ -1,4 +1,6 @@
-#%%
+"""Author: Sebastian Laverde Alfonso
+    Purpose: End-to-End Code Generation"""
+
 import os
 import time
 import json
@@ -42,8 +44,7 @@ class TokenizerWrap(Tokenizer):
         self.fit_on_texts(texts)
 
         # Create inverse lookup from integer-tokens to words.
-        self.index_to_word = dict(zip(self.word_index.values(),
-                                      self.word_index.keys()))
+        self.index_to_word = dict(zip(self.word_index.values(), self.word_index.keys()))
 
         # Convert all texts to lists of integer-tokens.
         # Note that the sequences may have different lengths.
@@ -69,16 +70,12 @@ class TokenizerWrap(Tokenizer):
         # We will pad / truncate all sequences to this length.
         # This is a compromise so we save a lot of memory and
         # only have to truncate maybe 5% of all the sequences.
-        self.max_tokens = np.mean(self.num_tokens) \
-                          + 2 * np.std(self.num_tokens)
+        self.max_tokens = np.mean(self.num_tokens) + 2 * np.std(self.num_tokens)
         self.max_tokens = int(self.max_tokens)
 
         # Pad / truncate all token-sequences to the given length.
         # This creates a 2-dim numpy matrix that is easier to use.
-        self.tokens_padded = pad_sequences(self.tokens,
-                                           maxlen=self.max_tokens,
-                                           padding=padding,
-                                           truncating=truncating)
+        self.tokens_padded = pad_sequences(self.tokens, maxlen=self.max_tokens, padding=padding, truncating=truncating)
 
     def token_to_word(self, token):
         """Lookup a single word from an integer-token."""
@@ -90,9 +87,7 @@ class TokenizerWrap(Tokenizer):
         """Convert a list of integer-tokens to a string."""
 
         # Create a list of the individual words.
-        words = [self.index_to_word[token]
-                 for token in tokens
-                 if token != 0]
+        words = [self.index_to_word[token] for token in tokens if token != 0]
         
         # Concatenate the words to a single string
         # with space between all the words.
@@ -126,21 +121,45 @@ class TokenizerWrap(Tokenizer):
 
         if padding:
             # Pad and truncate sequences to the given length.
-            tokens = pad_sequences(tokens,
-                                   maxlen=self.max_tokens,
-                                   padding='pre',
-                                   truncating=truncating)
+            tokens = pad_sequences(tokens, maxlen=self.max_tokens, padding='pre', truncating=truncating)
 
         return tokens
 
-#%%
-print("hello")
 num_words = 1000
-tokenizer_src = TokenizerWrap(texts=intents,
-                              padding='pre',
-                              reverse=True,
-                              num_words=num_words)
+mark_start = "s "
+mark_end = " e"
+
+tokenizer_intents = TokenizerWrap(texts=intents, padding='pre', reverse=True, num_words=num_words)
+tokenizer_snippets = TokenizerWrap(texts=snippets, padding='pre', reverse=True, num_words=num_words)
+tokens_intents = tokenizer_intents.tokens_padded
+tokens_snippets = tokenizer_snippets.tokens_padded
+
+#print(tokens_intents.shape)
+#print(tokens_snippets.shape)
+#print(type(tokens_intents))
+#print(tokens_intents)
+
+token_start = tokenizer_snippets.word_index[mark_start.strip()]
+#print(token_start)
+
+token_end = tokenizer_snippets.word_index[mark_end.strip()]
+#print(token_end)
+
+print(tokens_intents[2])
+print(tokenizer_intents.tokens_to_string(tokens_intents[2]))
+print(intents[2])
+print(tokens_intents[5])
+print(tokens_intents[4])
+print(tokens_intents[6])
+print(tokens_intents[8])
+print(tokens_intents[10], "\n____________________________________________________________")
+
+print(tokens_snippets[2])
+print(tokens_snippets[5])
+print(tokens_snippets[4])
+print(tokens_snippets[6])
+print(tokens_snippets[8])
+print(tokens_snippets[10])
 
 end = time.time()
 print(end - start)
-#%%
