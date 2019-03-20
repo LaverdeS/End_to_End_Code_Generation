@@ -4,7 +4,9 @@
 import os
 import time
 import json
+import math
 import numpy as np
+import matplotlib.pyplot as plt
 import tensorflow as tf
 
 from pprint import pprint
@@ -12,6 +14,14 @@ from tensorflow.python.keras.preprocessing.text import Tokenizer
 from tensorflow.python.keras.preprocessing.sequence import pad_sequences
 from tensorflow.python.keras.layers import Input, Dense, GRU, Embedding
 from tensorflow.python.keras.models import Model
+from tensorflow.python.keras.optimizers import RMSprop
+
+#from tensorflow.core.protobuf import rewriter_config_pb2
+    
+#config_proto = tf.ConfigProto()
+#off = rewriter_config_pb2.RewriterConfig.OFF
+#config_proto.graph_options.rewrite_options.arithmetic_optimization = off    
+#session = tf.Session(config=config_proto)
 
 start = time.time()
 
@@ -229,6 +239,157 @@ def connect_decoder(initial_state):
 
 decoder_output = connect_decoder(initial_state=encoder_output)
 model_train = Model(inputs=[encoder_input, decoder_input], outputs=[decoder_output])
+model_encoder = Model(inputs=[encoder_input], outputs=[encoder_output])
+decoder_output = connect_decoder(initial_state=decoder_initial_state)
+model_decoder = Model(inputs=[decoder_input, decoder_initial_state], outputs=[decoder_output])
+
+def sparse_cross_entropy(y_true, y_pred):
+    """
+    Calculate the cross-entropy loss between y_true and y_pred.
+    
+    y_true is a 2-rank tensor with the desired output.
+    The shape is [batch_size, sequence_length] and it
+    contains sequences of integer-tokens.
+
+    y_pred is the decoder's output which is a 3-rank tensor
+    with shape [batch_size, sequence_length, num_words]
+    so that for each sequence in the batch there is a one-hot
+    encoded array of length num_words.
+    """
+
+    # Calculate the loss. This outputs a
+    # 2-rank tensor of shape [batch_size, sequence_length]
+    loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=y_true,
+                                                          logits=y_pred)
+
+    # Keras may reduce this across the first axis (the batch)
+    # but the semantics are unclear, so to be sure we use
+    # the loss across the entire 2-rank tensor, we reduce it
+    # to a single scalar with the mean function.
+    loss_mean = tf.reduce_mean(loss)
+
+    return loss_mean
+
+optimizer = RMSprop(lr=1e-3)
+decoder_target = tf.placeholder(dtype='int32', shape=(None, None))
+model_train.compile(optimizer=optimizer, loss=sparse_cross_entropy, target_tensors=[decoder_target])
+
+x_data = \
+{
+    'encoder_input': encoder_input_data,
+    'decoder_input': decoder_input_data
+}
+y_data = \
+{
+    'decoder_output': decoder_output_data
+}
+validation_split = 10000 / len(encoder_input_data)
+print(validation_split)
+
+model_train.fit(x=x_data,
+                y=y_data,
+                batch_size=512,
+                epochs=1,
+                validation_split=validation_split)
+
+def translate(input_text, true_output_text=None):
+    """Translate a single text-string."""
+
+    # Convert the input-text to integer-tokens.
+    # Note the sequence of tokens has to be reversed.
+    # Padding is probably not necessary.
+    input_tokens = tokenizer_intents.text_to_tokens(text=input_text,
+                                                reverse=True,
+                                                padding=True)
+    
+    # Get the output of the encoder's GRU which will be
+    # used as the initial state in the decoder's GRU.
+    # This could also have been the encoder's final state
+    # but that is really only necessary if the encoder
+    # and decoder use the LSTM instead of GRU because
+    # the LSTM has two internal states.
+    initial_state = model_encoder.predict(input_tokens)
+
+    # Max number of tokens / words in the output sequence.
+    max_tokens = tokenizer_snippets.max_tokens
+
+    # Pre-allocate the 2-dim array used as input to the decoder.
+    # This holds just a single sequence of integer-tokens,
+    # but the decoder-model expects a batch of sequences.
+    shape = (1, max_tokens)
+    decoder_input_data = np.zeros(shape=shape, dtype=np.int)
+
+    # The first input-token is the special start-token for 'ssss '.
+    token_int = token_start
+
+    # Initialize an empty output-text.
+    output_text = ''
+
+    # Initialize the number of tokens we have processed.
+    count_tokens = 0
+
+    # While we haven't sampled the special end-token for ' eeee'
+    # and we haven't processed the max number of tokens.
+    while token_int != token_end and count_tokens < max_tokens:
+        # Update the input-sequence to the decoder
+        # with the last token that was sampled.
+        # In the first iteration this will set the
+        # first element to the start-token.
+        decoder_input_data[0, count_tokens] = token_int
+
+        # Wrap the input-data in a dict for clarity and safety,
+        # so we are sure we input the data in the right order.
+        x_data = \
+        {
+            'decoder_initial_state': initial_state,
+            'decoder_input': decoder_input_data
+        }
+
+        # Note that we input the entire sequence of tokens
+        # to the decoder. This wastes a lot of computation
+        # because we are only interested in the last input
+        # and output. We could modify the code to return
+        # the GRU-states when calling predict() and then
+        # feeding these GRU-states as well the next time
+        # we call predict(), but it would make the code
+        # much more complicated.
+
+        # Input this data to the decoder and get the predicted output.
+        decoder_output = model_decoder.predict(x_data)
+
+        # Get the last predicted token as a one-hot encoded array.
+        token_onehot = decoder_output[0, count_tokens, :]
+        
+        # Convert to an integer-token.
+        token_int = np.argmax(token_onehot)
+
+        # Lookup the word corresponding to this integer-token.
+        sampled_word = tokenizer_snippets.token_to_word(token_int)
+
+        # Append the word to the output-text.
+        output_text += " " + sampled_word
+
+        # Increment the token-counter.
+        count_tokens += 1
+
+    # Sequence of tokens output by the decoder.
+    output_tokens = decoder_input_data[0]
+    
+    # Print the input-text.
+    print("Input text:")
+    print(input_text)
+    print()
+
+    # Print the translated output-text.
+    print("Translated text:")
+    print(output_text)
+    print()
+
+    # Optionally print the true translated text.
+    if true_output_text is not None:
+        print("True output text:")
+        print(true_output_text)
+        print()
 
 end = time.time()
 print(end - start)
