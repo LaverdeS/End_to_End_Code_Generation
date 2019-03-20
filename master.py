@@ -24,7 +24,6 @@ for i in data:
     intents.append(i['intent'])
     snippets.append(i['snippet'])
 
-#%%
 class TokenizerWrap(Tokenizer):
     """Wrap the Tokenizer-class from Keras with more functionality.
     https://github.com/Hvass-Labs/TensorFlow-Tutorials/blob/master/21_Machine_Translation.ipynb"""
@@ -125,41 +124,49 @@ class TokenizerWrap(Tokenizer):
 
         return tokens
 
-num_words = 1000
-mark_start = "s "
-mark_end = " e"
+num_words = 10000
+mark_start = "start "
+mark_end = " end"
+j = 0
+
+for i in snippets:    
+    i = mark_start + i + mark_end
+    snippets[j] = i
+    j = j + 1
+
+print(snippets[0])
 
 tokenizer_intents = TokenizerWrap(texts=intents, padding='pre', reverse=True, num_words=num_words)
-tokenizer_snippets = TokenizerWrap(texts=snippets, padding='pre', reverse=True, num_words=num_words)
+tokenizer_snippets = TokenizerWrap(texts=snippets, padding='post', reverse=False, num_words=num_words)
 tokens_intents = tokenizer_intents.tokens_padded
 tokens_snippets = tokenizer_snippets.tokens_padded
 
-#print(tokens_intents.shape)
-#print(tokens_snippets.shape)
-#print(type(tokens_intents))
-#print(tokens_intents)
+print("Shape of tokenization of intents: ", tokens_intents.shape)
+print("Shape of tokenization of snippets: ",tokens_snippets.shape)
 
 token_start = tokenizer_snippets.word_index[mark_start.strip()]
-#print(token_start)
+print("token for start: ", token_start)
 
 token_end = tokenizer_snippets.word_index[mark_end.strip()]
-#print(token_end)
+print("token for start: ", token_end)
 
-print(tokens_intents[2])
-print(tokenizer_intents.tokens_to_string(tokens_intents[2]))
-print(intents[2])
-print(tokens_intents[5])
-print(tokens_intents[4])
-print(tokens_intents[6])
-print(tokens_intents[8])
-print(tokens_intents[10], "\n____________________________________________________________")
+print("intent: ", tokens_intents[5])
+print("snippet: ", tokens_snippets[5])
+print(tokenizer_snippets.tokens_to_string(tokens_snippets[5]))
+print(snippets[5])
 
-print(tokens_snippets[2])
-print(tokens_snippets[5])
-print(tokens_snippets[4])
-print(tokens_snippets[6])
-print(tokens_snippets[8])
-print(tokens_snippets[10])
+encoder_input_data = tokens_intents
+decoder_input_data = tokens_snippets[:, :-1]
+print("decoder input shape: ", decoder_input_data.shape)
+
+decoder_output_data = tokens_snippets[:, 1:]
+print("decoder output shape: ", decoder_output_data.shape)
+
+print(decoder_input_data[5])
+print(decoder_output_data[5])
+
+print(tokenizer_snippets.tokens_to_string(decoder_input_data[5]))
+print(tokenizer_snippets.tokens_to_string(decoder_output_data[5]))
 
 end = time.time()
 print(end - start)
