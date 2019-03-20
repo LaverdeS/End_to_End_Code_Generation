@@ -1,3 +1,4 @@
+#%%
 import os
 import time
 import json
@@ -22,7 +23,6 @@ for i in data:
     snippets.append(i['snippet'])
 
 #%%
-
 class TokenizerWrap(Tokenizer):
     """Wrap the Tokenizer-class from Keras with more functionality.
     https://github.com/Hvass-Labs/TensorFlow-Tutorials/blob/master/21_Machine_Translation.ipynb"""
@@ -133,8 +133,8 @@ class TokenizerWrap(Tokenizer):
 
         return tokens
 
-
-
+#%%
+print("hello")
 num_words = 1000
 tokenizer_src = TokenizerWrap(texts=intents,
                               padding='pre',
