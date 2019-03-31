@@ -13,7 +13,7 @@ Then the system would be required to output
 
 > x.sort(reverse=True)
 
-Split into 2,379 training and 500 test examples. The json file format is shown as [follows](json.png):
+Split into 2,379 training and 500 test examples. The json file format is shown as [follows](./json.png):
 
 >{
   
