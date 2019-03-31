@@ -20,17 +20,17 @@ Tensorflow - Keras
 
 ## Description
 
-Same implementation as [Machine Translation](https://github.com/Hvass-Labs/TensorFlow-Tutorials/blob/master/21_Machine_Translation.ipynb). I am considering sequences of words and not of single characters. An encoder which maps the source-text to a "thought vector" that summarizes the text's contents, which is then input to the second part of the neural network that decodes the "thought vector" to the destination-text.
+Adaptation of [Machine Translation](https://github.com/Hvass-Labs/TensorFlow-Tutorials/blob/master/21_Machine_Translation.ipynb) neural network. I am considering sequences of words and not of single characters. An encoder which maps the source-text to a "thought vector" that summarizes the text's contents, which is then input to the second part of the neural network that decodes the "thought vector" to the destination-text.
 
 ### Encoder
 Neural Networks cannot work directly on text-data. We use a two-step process to convert text into numbers that can be used in a neural network.
 #### Tokenizer
-Convert each word to an integer-token.
-##### Output
+Convert each word to an integer-token. It also reverses the order of the words because this could increase, said in 
+##### [Output]
 
 #### Embedding
 Convert each integer-token to a vector of floating-point values. The embedding is trained alongside the rest of the neural network to map words with similar semantic meaning to similar vectors of floating-point values.
-#### Output
+##### [Output]
 
 **These embedding-vectors can then be input to the Recurrent Neural Network, which has 3 GRU-layers.**
 
@@ -38,8 +38,7 @@ The last GRU-layer outputs a single vector - the "thought vector" that summarize
 
 ### Decoder
 The destination-text is padded with special markers to indicate its beginning and end.
-
-##### Output
+##### [Output]
 
 ## Results
 ### Parameters
@@ -49,9 +48,13 @@ The destination-text is padded with special markers to indicate its beginning an
   - Number of layers: 
   - Number of ....: 
 
+[Training the model]
+
 ### Intention-to-Snippet
 
 ## Improvements
+The results are always the same and are not correct. This could be improved considering some adjustments:
   - Don't work with words but character to character
-  - Mind the rewritten intent for better matching
+  - Mind the rewritten intent of json file for better matching
+  - Change the dataset
   
