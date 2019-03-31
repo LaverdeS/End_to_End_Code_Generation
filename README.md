@@ -11,7 +11,7 @@ Code/Natural Language Challenge, a joint project of the Carnegie Mellon Universi
 
 Then the system would be required to output
 
-> x.sort(reverse=True) in Python.
+> x.sort(reverse=True)
 
 Split into 2,379 training and 500 test examples. The json file format is shown as follows:
 
