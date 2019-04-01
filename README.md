@@ -15,7 +15,7 @@ Then the system would be required to output
 
 The data is available in [conala-train.json](conala-train.json) and [conala-test.json](conala-test.json). Split into 2,379 training and 500 test examples. The json file format is shown as [follows](json.PNG):
 
-## Requisites
+## Requirements
 Tensorflow - Keras
 
 ## Description
