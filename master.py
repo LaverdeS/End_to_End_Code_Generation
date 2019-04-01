@@ -287,7 +287,7 @@ y_data = \
 validation_split = 10000 / len(encoder_input_data)
 #print(validation_split)
 
-#model_train.fit(x=x_data, y=y_data, batch_size=512, epochs=20, validation_split=validation_split)
+model_train.fit(x=x_data, y=y_data, batch_size=512, epochs=20, validation_split=validation_split)
 
 def generate_code(input_text, true_output_text=None):
     """Generate_code for a single text-string."""
@@ -388,7 +388,7 @@ def generate_code(input_text, true_output_text=None):
         print(true_output_text)
         print()
 
-#generate_code(input_text=intents[2], true_output_text=snippets[2])
+generate_code(input_text=intents[2], true_output_text=snippets[2])
 #generate_code(input_text=intents[3], true_output_text=snippets[3])
 #generate_code(input_text=intents[4], true_output_text=snippets[4])
 #generate_code(input_text=intents[5], true_output_text=snippets[5])
