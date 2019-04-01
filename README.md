@@ -39,9 +39,11 @@ Neural Networks cannot work directly on text-data. We use a two-step process to 
   Example for intent case 5: 
   
   intent: **Prepend the same string to all items in a list**
+  
   > snippet: start ['hello{0}'.format(i) for i in a] end
   
   intent:  [  0   0   0   0   0   7   1   2  78  28   4   8 102   9 929]
+  
   snippet:  [  1 290   9   3  63  14   6  14   4   8   2   0   0   0   0   0   0]
   
   **Markers 'start' and 'end' are tokenized as 1 and 2.**
@@ -79,9 +81,10 @@ The destination-text is padded with special markers to indicate its beginning an
 Example with intent [5]:
 
 [  1 290   9   3  63  14   6  14   4   8   2   0   0   0   0   0]
+
 [290   9   3  63  14   6  14   4   8   2   0   0   0   0   0   0]
 
-token to text decoder output: start 'hello 0 ' format i for i in a end
+**token to text decoder output:** start 'hello 0 ' format i for i in a end
 
 The decoder is built using the functional API of Keras, which allows more flexibility in connecting the layers e.g. to route different inputs to the decoder. This is useful because we have to connect the decoder directly to the encoder, but we will also connect the decoder to another input to run it separately.
 
@@ -100,8 +103,6 @@ data used to train artificial intelligence (AI) with the goal of finding and opt
   - Number of States: 512
   - Number of epochs: 20
   - Number of layers: 3
-
-[Training the model]
 
 ### Intention-to-Snippet
 #### Loss Reduction
@@ -162,6 +163,8 @@ Translated text:
 
 True output text:
 start [(i, sum(j) / len(j)) for i, j in list(d.items())] end
+
+TOTAL TIME OF EXECUTION: 
 
 ## Improvements
 The results are always the same and are not correct. This could be improved considering some adjustments:
