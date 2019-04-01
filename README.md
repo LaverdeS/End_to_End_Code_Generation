@@ -94,8 +94,6 @@ The decoder outputs a tensor with shape [batch_size, sequence_length, num_words]
 
 This comparison is done with a sparse-cross-entropy function directly from TensorFlow.
 
-data used to train artificial intelligence (AI) with the goal of finding and optimizing the best model to solve a given problem.
-
 ## Results
 ### Parameters
   - Number of words: 5000
