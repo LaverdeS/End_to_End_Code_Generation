@@ -20,7 +20,7 @@ Tensorflow - Keras
 
 ## Description
 
-Adaptation of [Machine Translation](https://github.com/Hvass-Labs/TensorFlow-Tutorials/blob/master/21_Machine_Translation.ipynb) neural network. I am considering sequences of words and not of single characters. An encoder which maps the source-text to a "thought vector" that summarizes the text's contents, which is then input to the second part of the neural network that decodes the "thought vector" to the destination-text.
+Adaptation of [Machine Translation](https://github.com/Hvass-Labs/TensorFlow-Tutorials/blob/master/21_Machine_Translation.ipynb). I am considering sequences of words and not of single characters. An encoder which maps the source-text to a "thought vector" that summarizes the text's contents, which is then input to the second part of the neural network that decodes the "thought vector" to the destination-text.
 
 ### Encoder
 Neural Networks cannot work directly on text-data. We use a two-step process to convert text into numbers that can be used in a neural network.
