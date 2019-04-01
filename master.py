@@ -1,5 +1,5 @@
 """Author: Sebastian Laverde Alfonso
-    Purpose: End-to-End Code Generation"""
+    Purpose: End-to-End Code Generation based on machine translation adaptation"""
 
 import os
 import time
@@ -160,12 +160,13 @@ token_start = tokenizer_snippets.word_index[mark_start.strip()]
 print("token for start: ", token_start)
 
 token_end = tokenizer_snippets.word_index[mark_end.strip()]
-print("token for start: ", token_end)
+print("token for end: ", token_end)
 
 print("intent: ", tokens_intents[5])
 print("snippet: ", tokens_snippets[5])
 print(tokenizer_snippets.tokens_to_string(tokens_snippets[5]))
 print(snippets[5])
+print(intents[5])
 
 encoder_input_data = tokens_intents
 decoder_input_data = tokens_snippets[:, :-1]
@@ -288,8 +289,8 @@ validation_split = 10000 / len(encoder_input_data)
 
 #model_train.fit(x=x_data, y=y_data, batch_size=512, epochs=20, validation_split=validation_split)
 
-def translate(input_text, true_output_text=None):
-    """Translate a single text-string."""
+def generate_code(input_text, true_output_text=None):
+    """Generate_code for a single text-string."""
 
     # Convert the input-text to integer-tokens.
     # Note the sequence of tokens has to be reversed.
@@ -376,26 +377,26 @@ def translate(input_text, true_output_text=None):
     print(input_text)
     print()
 
-    # Print the translated output-text.
-    print("Translated text:")
+    # Print the generated code output-text.
+    print("Generated code:")
     print(output_text)
     print()
 
-    # Optionally print the true translated text.
+    # Optionally print the true code snippet.
     if true_output_text is not None:
         print("True output text:")
         print(true_output_text)
         print()
 
-#translate(input_text=intents[2], true_output_text=snippets[2])
-#translate(input_text=intents[3], true_output_text=snippets[3])
-#translate(input_text=intents[4], true_output_text=snippets[4])
-#translate(input_text=intents[5], true_output_text=snippets[5])
-#translate(input_text=intents[8], true_output_text=snippets[8])
-#translate(input_text=intents[10], true_output_text=snippets[10])
-#translate(input_text=intents[22], true_output_text=snippets[22])
+#generate_code(input_text=intents[2], true_output_text=snippets[2])
+#generate_code(input_text=intents[3], true_output_text=snippets[3])
+#generate_code(input_text=intents[4], true_output_text=snippets[4])
+#generate_code(input_text=intents[5], true_output_text=snippets[5])
+#generate_code(input_text=intents[8], true_output_text=snippets[8])
+#generate_code(input_text=intents[10], true_output_text=snippets[10])
+#generate_code(input_text=intents[22], true_output_text=snippets[22])
 
-#translate(input_text="python convert list to dictionary",
+#generate_code(input_text="python convert list to dictionary",
 #          true_output_text='dict(zip(l[::2], l[1::2]))')
 
 end = time.time()
