@@ -164,7 +164,7 @@ Translated text:
 True output text:
 start [(i, sum(j) / len(j)) for i, j in list(d.items())] end
 
-TOTAL TIME OF EXECUTION: 
+TOTAL TIME OF EXECUTION: 20.25 min
 
 ## Improvements
 The results are always the same and are not correct. This could be improved considering some adjustments:
